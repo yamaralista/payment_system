@@ -3,6 +3,7 @@ package com.example.payment_system_v3.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -14,4 +15,5 @@ public class CardResponseDto {
     private LocalDateTime createdAt;
     private Long paymentSystemId;
     private Long clientId;
+    private BigDecimal balance;
 }
