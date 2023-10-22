@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -31,6 +32,11 @@ public class Card {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_system_id", nullable = false)
     private PaymentSystem paymentSystem;
+    @Column(name = "pin_code", nullable = false)
+    private String pinCode;
+
+    @Column(name = "balance")
+    private BigDecimal balance;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
