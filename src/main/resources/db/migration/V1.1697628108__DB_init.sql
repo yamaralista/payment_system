@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS public.card (
                       expiration_date TIMESTAMP NOT NULL,
                       payment_system_id BIGINT NOT NULL REFERENCES payment_system(id),
                       client_id BIGINT REFERENCES public.client(id) ON DELETE CASCADE,
-                      balance INTEGER NOT NULL DEFAULT 0,
+                      balance DECIMAL(10,2) NOT NULL DEFAULT 0,
+                      pin_code VARCHAR,
                       created_at TIMESTAMP NOT NULL
 );
 
