@@ -1,4 +1,4 @@
-package com.example.payment_system_v3.service.impl;
+package com.example.payment_system_v3.sevice.impl;
 
 import com.example.payment_system_v3.dto.CardRequestDto;
 import com.example.payment_system_v3.entity.Card;
@@ -10,7 +10,7 @@ import com.example.payment_system_v3.exception.InvalidPinException;
 import com.example.payment_system_v3.mapper.CardMapper;
 import com.example.payment_system_v3.repository.CardRepository;
 import com.example.payment_system_v3.repository.ClientRepository;
-import com.example.payment_system_v3.service.ProcessingCenterStrategy;
+import com.example.payment_system_v3.sevice.ProcessingCenterStrategy;
 import com.example.payment_system_v3.validator.CardValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -71,13 +71,13 @@ public class MasterCardProcessingCenterStrategyImpl implements ProcessingCenterS
     }
 
     @Override
-    public void topUpCard(CardRequestDto cardRequestDto, BigDecimal  amount) throws InvalidPinException, CardNotFoundException {
-        Optional<Card> cardOptional = cardRepository.getCardByCardNumber(cardRequestDto.getCardNumber());
+    public void topUpCard(Card card, BigDecimal  amount) throws InvalidPinException, CardNotFoundException {
+        Optional<Card> cardOptional = cardRepository.getCardByCardNumber(card.getCardNumber());
         if (cardOptional.isEmpty()){
             throw new CardNotFoundException("There is no such card");
         }
-        Card card = cardOptional.get();
-        BigDecimal currentBalance = card.getBalance();
+        Card cardCurrent = cardOptional.get();
+        BigDecimal currentBalance = cardCurrent.getBalance();
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0){
             throw new IllegalArgumentException("Invalid amount");
@@ -86,26 +86,24 @@ public class MasterCardProcessingCenterStrategyImpl implements ProcessingCenterS
         BigDecimal newBalance = currentBalance.add(amount);
         card.setBalance(newBalance);
 
-        cardRepository.save(card);
+        cardRepository.save(cardCurrent);
     }
 
     @Override
-    public void debitCard(CardRequestDto cardRequestDto, BigDecimal amount) throws InvalidPinException, CardNotFoundException {
-        String pinCode = cardRequestDto.getPinCode();
-        Optional<Card> cardOptional = cardRepository.getCardByCardNumber(cardRequestDto.getCardNumber());
+    public void debitCard(Card card, BigDecimal amount) throws InvalidPinException, CardNotFoundException {
+
+        Optional<Card> cardOptional = cardRepository.getCardByCardNumber(card.getCardNumber());
         if (cardOptional.isEmpty()){
             throw new CardNotFoundException("There is no such card");
         }
-        Card card = cardOptional.get();
-        if (!this.passwordEncoder.matches(pinCode,card.getPinCode())) {
-            throw new InvalidPinException("Invalid PIN code");
-        }
-        BigDecimal currentBalance = card.getBalance();
+        Card cardCurrent = cardOptional.get();
+
+        BigDecimal currentBalance = cardCurrent.getBalance();
 
         BigDecimal newBalance = currentBalance.subtract(amount);
         card.setBalance(newBalance);
 
-        cardRepository.save(card);
+        cardRepository.save(cardCurrent);
     }
 
 
