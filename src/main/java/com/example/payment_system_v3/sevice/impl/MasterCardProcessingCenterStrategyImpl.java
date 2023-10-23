@@ -20,6 +20,11 @@ import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.Random;
 
+/**
+ * Этот класс реализует стратегию обработки для платежных карт MasterCard.
+ * Стратегия включает в себя выпуск карт, пополнение и списание средств.
+ */
+
 @Service
 public class MasterCardProcessingCenterStrategyImpl implements ProcessingCenterStrategy {
     private final CardRepository cardRepository;
@@ -27,6 +32,14 @@ public class MasterCardProcessingCenterStrategyImpl implements ProcessingCenterS
     private final CardValidator cardValidator;
     private final ClientRepository clientRepository;
 
+    /**
+     * Конструктор класса для внедрения зависимостей через Spring.
+     *
+     * @param cardRepository     Репозиторий для работы с данными карт
+     * @param passwordEncoder    Кодировщик паролей
+     * @param cardValidator      Валидатор карт
+     * @param clientRepository   Репозиторий для работы с данными клиентов
+     */
     @Autowired
     public MasterCardProcessingCenterStrategyImpl(CardRepository cardRepository, PasswordEncoder passwordEncoder,
                                                   CardValidator cardValidator, ClientRepository clientRepository) {
@@ -37,6 +50,13 @@ public class MasterCardProcessingCenterStrategyImpl implements ProcessingCenterS
     }
 
 
+    /**
+     * Метод выпускает новую карту MasterCard на основе данных из DTO.
+     *
+     * @param cardRequestDto Информация о новой карте, переданная через DTO
+     * @throws InvalidCredentialsException Исключение, если данные карты недействительны
+     * @throws ClientNotFoundException    Исключение, если клиент не найден
+     */
     @Override
     public void issueCard(CardRequestDto cardRequestDto) throws InvalidCredentialsException, ClientNotFoundException {
         this.cardValidator.validateCardRequestDto(cardRequestDto);
@@ -61,6 +81,11 @@ public class MasterCardProcessingCenterStrategyImpl implements ProcessingCenterS
         return "5" + generateNumber(15);
     }
 
+    /**
+     * Генерирует уникальный номер карты MasterCard.
+     *
+     * @return Уникальный номер карты
+     */
     private String generateNumber(int length) {
         Random random = new Random();
         StringBuilder sb = new StringBuilder();
@@ -70,6 +95,15 @@ public class MasterCardProcessingCenterStrategyImpl implements ProcessingCenterS
         return sb.toString();
     }
 
+    /**
+     * Метод для пополнения баланса карты MasterCard.
+     *
+     * @param card   Карта, на которую производится пополнение
+     * @param amount Сумма для пополнения
+     * @throws InvalidPinException    Исключение, если введен неверный пин-код
+     * @throws CardNotFoundException   Исключение, если карта не найдена
+     * @throws IllegalArgumentException Исключение, если сумма недействительна
+     */
     @Override
     public void topUpCard(Card card, BigDecimal  amount) throws InvalidPinException, CardNotFoundException {
         Optional<Card> cardOptional = cardRepository.getCardByCardNumber(card.getCardNumber());
@@ -89,6 +123,14 @@ public class MasterCardProcessingCenterStrategyImpl implements ProcessingCenterS
         cardRepository.save(cardCurrent);
     }
 
+    /**
+     * Метод для списания средств с карты MasterCard.
+     *
+     * @param card   Карта, с которой производится списание
+     * @param amount Сумма для списания
+     * @throws InvalidPinException    Исключение, если введен неверный пин-код
+     * @throws CardNotFoundException   Исключение, если карта не найдена
+     */
     @Override
     public void debitCard(Card card, BigDecimal amount) throws InvalidPinException, CardNotFoundException {
 

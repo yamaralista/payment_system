@@ -9,6 +9,10 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * Этот класс представляет собой наивную реализацию сущности карты в системе. Каждая карта имеет уникальный номер, дату истечения,
+ * дату создания, привязанную платежную систему (например, Visa, MasterCard), PIN-код, баланс и привязанного клиента.
+ */
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor

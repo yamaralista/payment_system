@@ -3,14 +3,18 @@ package com.example.payment_system_v3.dto;
 
 import com.example.payment_system_v3.entity.Client;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class CardRequestDto {
 

@@ -20,6 +20,10 @@ import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.Random;
 
+/**
+ * Этот класс представляет собой реализацию стратегии обработки для платежной системы Visa.
+ * Он обеспечивает функциональность по выпуску карт Visa, пополнению счета и списанию средств с карт Visa.
+ */
 @Service
 public class VisaProcessingCenterStrategyImpl implements ProcessingCenterStrategy {
     private final CardRepository cardRepository;
@@ -27,6 +31,14 @@ public class VisaProcessingCenterStrategyImpl implements ProcessingCenterStrateg
     private final CardValidator cardValidator;
     private final ClientRepository clientRepository;
 
+    /**
+     * Конструктор класса для внедрения зависимостей через Spring.
+     *
+     * @param cardRepository     Репозиторий для работы с данными карт
+     * @param passwordEncoder    Кодировщик паролей для безопасного хранения PIN-кодов карт
+     * @param cardValidator      Валидатор для проверки корректности данных карт
+     * @param clientRepository   Репозиторий для работы с данными клиентов
+     */
     @Autowired
     public VisaProcessingCenterStrategyImpl(CardRepository cardRepository, PasswordEncoder passwordEncoder, CardValidator cardValidator, ClientRepository clientRepository) {
         this.cardRepository = cardRepository;
@@ -34,6 +46,14 @@ public class VisaProcessingCenterStrategyImpl implements ProcessingCenterStrateg
         this.cardValidator = cardValidator;
         this.clientRepository = clientRepository;
     }
+
+    /**
+     * Метод выпуска карты Visa на основе данных из CardRequestDto.
+     *
+     * @param cardRequestDto Данные для выпуска карты Visa
+     * @throws InvalidCredentialsException Исключение, если данные карты недопустимы
+     * @throws ClientNotFoundException     Исключение, если клиент не найден
+     */
     @Override
     public void issueCard(CardRequestDto cardRequestDto) throws InvalidCredentialsException, ClientNotFoundException {
         this.cardValidator.validateCardRequestDto(cardRequestDto);
@@ -57,6 +77,11 @@ public class VisaProcessingCenterStrategyImpl implements ProcessingCenterStrateg
         return "4" + generateNumber(15);
     }
 
+    /**
+     * Генерирует уникальный номер карты Visa.
+     *
+     * @return Уникальный номер карты
+     */
     private String generateNumber(int length) {
         Random random = new Random();
         StringBuilder sb = new StringBuilder();
@@ -66,6 +91,15 @@ public class VisaProcessingCenterStrategyImpl implements ProcessingCenterStrateg
         return sb.toString();
     }
 
+    /**
+     * Метод для пополнения баланса карты Visa.
+     *
+     * @param card   Карта, на которую производится пополнение
+     * @param amount Сумма для пополнения
+     * @throws InvalidPinException    Исключение, если введен неверный пин-код
+     * @throws CardNotFoundException   Исключение, если карта не найдена
+     * @throws IllegalArgumentException Исключение, если сумма недействительна
+     */
     @Override
     public void topUpCard(Card card, BigDecimal  amount) throws InvalidPinException, CardNotFoundException {
         Optional<Card> cardOptional = cardRepository.getCardByCardNumber(card.getCardNumber());
@@ -85,6 +119,14 @@ public class VisaProcessingCenterStrategyImpl implements ProcessingCenterStrateg
         cardRepository.save(cardCurrent);
     }
 
+    /**
+     * Метод для списания средств с карты Visa.
+     *
+     * @param card   Карта, с которой производится списание
+     * @param amount Сумма для списания
+     * @throws InvalidPinException    Исключение, если введен неверный пин-код
+     * @throws CardNotFoundException   Исключение, если карта не найдена
+     */
     @Override
     public void debitCard(Card card,BigDecimal amount) throws InvalidPinException, CardNotFoundException {
 
